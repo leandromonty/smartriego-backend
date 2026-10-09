@@ -1,7 +1,7 @@
 from datetime import datetime
 from decimal import Decimal
 
-from sqlalchemy import Boolean, Enum, ForeignKey, Numeric, String, func
+from sqlalchemy import BigInteger, Boolean, Enum, ForeignKey, Numeric, String, func
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
@@ -76,3 +76,25 @@ class Dispositivo(Base):
     creado_en: Mapped[datetime] = mapped_column(server_default=func.now())
 
     producto: Mapped["Producto"] = relationship()
+
+
+class Lectura(Base):
+    __tablename__ = "lecturas"
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    dispositivo_id: Mapped[int] = mapped_column(ForeignKey("dispositivos.id"))
+    humedad: Mapped[Decimal] = mapped_column(Numeric(5, 2))
+    deposito_bajo: Mapped[bool] = mapped_column(Boolean, default=False)
+    bomba_activa: Mapped[bool] = mapped_column(Boolean, default=False)
+    creado_en: Mapped[datetime] = mapped_column(server_default=func.now())
+
+
+class Comando(Base):
+    __tablename__ = "comandos"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    dispositivo_id: Mapped[int] = mapped_column(ForeignKey("dispositivos.id"))
+    tipo: Mapped[str] = mapped_column(Enum("riego_manual"), default="riego_manual")
+    estado: Mapped[str] = mapped_column(Enum("pendiente", "ejecutado"), default="pendiente")
+    creado_en: Mapped[datetime] = mapped_column(server_default=func.now())
+    ejecutado_en: Mapped[datetime | None]
