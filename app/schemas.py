@@ -82,3 +82,37 @@ class DispositivoOut(BaseModel):
 class PagoOut(BaseModel):
     pedido: PedidoOut
     dispositivos: list[DispositivoOut]
+
+    # --- Equipo (Arduino/ESP32) ---
+class ActivarIn(BaseModel):
+    codigo_activacion: str = Field(min_length=4, max_length=20)
+
+
+class ActivarOut(BaseModel):
+    api_key: str
+    dispositivo_id: int
+    umbral_humedad: int
+
+
+class LecturaIn(BaseModel):
+    humedad: float = Field(ge=0, le=100)
+    deposito_bajo: bool = False
+    bomba_activa: bool = False
+
+
+class LecturaRespuesta(BaseModel):
+    riego_manual: bool
+    umbral_humedad: int
+
+
+# --- App (mismos nombres de campo que el backend de prueba) ---
+class LecturaApp(BaseModel):
+    humedad: int
+    bomba_encendida: bool
+    deposito_bajo: bool = False
+    riego_pendiente: bool = False
+
+
+class RegistroApp(BaseModel):
+    humedad: int
+    hora: str
