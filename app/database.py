@@ -13,7 +13,11 @@ url = URL.create(
     database=settings.db_name,
 )
 
-engine = create_engine(url, pool_pre_ping=True)
+# Aiven exige SSL. En local (127.0.0.1 / localhost) no hace falta.
+_es_local = settings.db_host in ("127.0.0.1", "localhost")
+_connect_args = {} if _es_local else {"ssl": {"check_hostname": False}}
+
+engine = create_engine(url, pool_pre_ping=True, connect_args=_connect_args)
 SessionLocal = sessionmaker(bind=engine, autoflush=False)
 
 
