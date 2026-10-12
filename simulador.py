@@ -1,3 +1,4 @@
+import os
 import random
 import sys
 import time
@@ -5,17 +6,23 @@ from pathlib import Path
 
 import requests
 
-API = "http://127.0.0.1:8000"
+# Por defecto apunta al backend en Render. Para probar en local:
+#   $env:SMARTRIEGO_API="http://127.0.0.1:8000"   (PowerShell)
+API = os.environ.get("SMARTRIEGO_API", "https://smartriego-backend.onrender.com")
 
 codigo = sys.argv[1].strip().upper() if len(sys.argv) > 1 else input("Código de activación: ").strip().upper()
 archivo_clave = Path(f".clave_{codigo}.txt")
+
+print(f"Servidor: {API}")
 
 # La API key se guarda en un archivo, igual que el Arduino la guardaría en su memoria
 if archivo_clave.exists():
     clave = archivo_clave.read_text().strip()
     print("Equipo ya activado, usando la clave guardada.")
 else:
-    r = requests.post(f"{API}/equipo/activar", json={"codigo_activacion": codigo}, timeout=5)
+    print("Activando (si el servidor estaba dormido puede tardar hasta 1 minuto)...")
+    # timeout largo: el plan gratuito de Render tarda en despertar
+    r = requests.post(f"{API}/equipo/activar", json={"codigo_activacion": codigo}, timeout=60)
     if r.status_code != 200:
         print("No se pudo activar:", r.json().get("detail", r.text))
         sys.exit(1)
@@ -39,7 +46,7 @@ while True:
             f"{API}/equipo/lecturas",
             headers={"X-API-Key": clave},
             json={"humedad": round(humedad, 1), "deposito_bajo": False, "bomba_activa": bomba},
-            timeout=5,
+            timeout=30,
         )
         r.raise_for_status()
         resp = r.json()
