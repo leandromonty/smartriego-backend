@@ -4,7 +4,7 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from .database import get_db
-from .routers import auth, dispositivos, equipo, pedidos, productos
+from .routers import admin, auth, dispositivos, equipo, pedidos, productos
 
 app = FastAPI(title="SmartRiego API")
 
@@ -23,6 +23,7 @@ app.include_router(productos.router)
 app.include_router(pedidos.router)
 app.include_router(dispositivos.router)
 app.include_router(equipo.router)
+app.include_router(admin.router)
 
 
 @app.get("/health")
