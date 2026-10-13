@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
+from typing import Literal
 
 
 class RegistroIn(BaseModel):
@@ -13,6 +14,13 @@ class LoginIn(BaseModel):
     email: EmailStr
     password: str
 
+class PerfilIn(BaseModel):
+      # solo se aceptan estos avatares (coinciden con los de la web)
+      avatar: Literal[
+          "plantita", "gotita", "cactus", "girasol",
+          "hoja", "regadera", "tomate", "nube",
+      ]
+
 
 class UsuarioOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -21,6 +29,7 @@ class UsuarioOut(BaseModel):
     nombre: str
     email: str
     rol: str
+    avatar: str
     creado_en: datetime
 
 

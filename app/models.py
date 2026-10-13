@@ -17,6 +17,7 @@ class Usuario(Base):
     email: Mapped[str] = mapped_column(String(150), unique=True)
     password_hash: Mapped[str] = mapped_column(String(255))
     rol: Mapped[str] = mapped_column(Enum("cliente", "admin"), default="cliente")
+    avatar: Mapped[str] = mapped_column(String(30), default="plantita", server_default="plantita")
     creado_en: Mapped[datetime] = mapped_column(server_default=func.now())
 
 

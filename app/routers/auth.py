@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 
 from ..database import get_db
 from ..models import Usuario
-from ..schemas import LoginIn, RegistroIn, TokenOut, UsuarioOut
+from ..schemas import LoginIn, PerfilIn, RegistroIn, TokenOut, UsuarioOut
 from ..security import crear_token, hashear, usuario_actual, verificar
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -46,4 +46,17 @@ def login(datos: LoginIn, db: Session = Depends(get_db)):
 
 @router.get("/me", response_model=UsuarioOut)
 def me(usuario: Usuario = Depends(usuario_actual)):
+    return usuario
+
+
+@router.patch("/me", response_model=UsuarioOut)
+def actualizar_perfil(
+    datos: PerfilIn,
+    usuario: Usuario = Depends(usuario_actual),
+    db: Session = Depends(get_db),
+):
+    # solo se puede cambiar el avatar; el rol y el resto no se tocan desde acá
+    usuario.avatar = datos.avatar
+    db.commit()
+    db.refresh(usuario)
     return usuario
